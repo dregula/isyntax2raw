@@ -26,6 +26,11 @@ from PIL import Image
 from kajiki import PackageLoader
 from tifffile import imwrite
 
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    # Try backported to PY<37 `importlib_resources`.
+    import importlib_resources as pkg_resources
 
 log = logging.getLogger(__name__)
 
@@ -47,6 +52,7 @@ class MaxQueuePool(object):
       * https://bugs.python.org/issue29595
       * https://github.com/python/cpython/pull/143
     """
+
     def __init__(self, executor, max_queue_size, max_workers=None):
         if max_workers is None:
             max_workers = max_queue_size
@@ -76,8 +82,8 @@ class MaxQueuePool(object):
 class WriteTiles(object):
 
     def __init__(
-        self, tile_width, tile_height, resolutions, file_type, max_workers,
-        batch_size, input_path, output_path
+            self, tile_width, tile_height, resolutions, file_type, max_workers,
+            batch_size, input_path, output_path
     ):
         self.tile_width = tile_width
         self.tile_height = tile_height
@@ -120,7 +126,7 @@ class WriteTiles(object):
                 "DICOM time of last calibration":
                     pe_in.DICOM_TIME_OF_LAST_CALIBRATION,
                 "DICOM manufacturer":
-                pe_in.DICOM_MANUFACTURER,
+                    pe_in.DICOM_MANUFACTURER,
                 "DICOM manufacturer model name":
                     pe_in.DICOM_MANUFACTURERS_MODEL_NAME,
                 "DICOM device serial number":
@@ -244,7 +250,8 @@ class WriteTiles(object):
             }
         }
         loader = PackageLoader()
-        template = loader.import_("isyntax2raw.resources.ome_template")
+        template = loader.import_('isyntax2raw.resources.ome_template')
+
         xml = template(xml_values).render()
         ome_xml_file = os.path.join(self.slide_directory, "METADATA.ome.xml")
         with open(ome_xml_file, "w") as omexml:
@@ -343,8 +350,8 @@ class WriteTiles(object):
             resolutions = range(self.resolutions)
 
         def write_tile(
-            pixels, resolution, x_start, y_start, tile_width, tile_height,
-            filename
+                pixels, resolution, x_start, y_start, tile_width, tile_height,
+                filename
         ):
             x_end = x_start + tile_width
             y_end = y_start + tile_height
@@ -361,11 +368,12 @@ class WriteTiles(object):
                     # is much more performant with the Bio-Formats API
                     pixels = self.make_planar(pixels, tile_width, tile_height)
                     with open(filename, 'wb') as destination:
-                        imwrite(destination, pixels, planarconfig='SEPARATE')
+                        # imwrite(destination, pixels, planarconfig='SEPARATE')
+                        imwrite(destination, pixels, photometric='rgb', compress=6,)
                 else:
                     with Image.frombuffer(
-                        'RGB', (int(tile_width), int(tile_height)),
-                        pixels, 'raw', 'RGB', 0, 1
+                            'RGB', (int(tile_width), int(tile_height)),
+                            pixels, 'raw', 'RGB', 0, 1
                     ) as source, open(filename, 'wb') as destination:
                         source.save(destination)
             except Exception:
@@ -482,7 +490,7 @@ class WriteTiles(object):
             os.mkdir(x_directory)
 
     def create_patch_list(
-        self, dim_ranges, tiles, tile_size, tile_directory
+            self, dim_ranges, tiles, tile_size, tile_directory
     ):
         resolution_x_end = dim_ranges[0][2]
         resolution_y_end = dim_ranges[1][2]
