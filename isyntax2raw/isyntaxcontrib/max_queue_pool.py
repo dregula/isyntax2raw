@@ -1,4 +1,4 @@
-# from isyntax2raw import *
+
 from threading import BoundedSemaphore
 
 

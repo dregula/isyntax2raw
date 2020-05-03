@@ -1,3 +1,4 @@
+
 from isyntax2raw import log
 import os
 import json
@@ -29,6 +30,8 @@ class WriteTiles(object):
         self.batch_size = batch_size
         self.input_path = input_path
         self.slide_directory = output_path
+        self.zarr_store = None
+        self.zarr_group = None
 
         os.mkdir(self.slide_directory)
 
@@ -38,7 +41,7 @@ class WriteTiles(object):
         self.pixel_engine = pixelengine.PixelEngine(
             render_backend, render_context
         )
-        self.pixel_engine["in"].open(input_path, "ficom")
+        self.pixel_engine["in"].open(self.input_path, "ficom")
 
     def __enter__(self):
         return self
@@ -290,6 +293,15 @@ class WriteTiles(object):
             pixels, resolution, x_start, y_start, tile_width, tile_height,
             filename
         ):
+            """
+            :type pixels: bytearray
+            :param resolution:
+            :param x_start:
+            :param y_start:
+            :param tile_width:
+            :param tile_height:
+            :param filename:
+            """
             x_end = x_start + tile_width
             y_end = y_start + tile_height
             try:
@@ -441,7 +453,7 @@ class WriteTiles(object):
         scale_x = dim_ranges[0][1]
         scale_y = dim_ranges[1][1]
         # We'll use the X scale to calculate our level.  If the X and Y scales
-        # are not eqivalent or not a power of two this will not work but that
+        # are not equivalent or not a power of two this will not work but that
         # seems *highly* unlikely
         level = math.log2(scale_x)
         if scale_x != scale_y or not level.is_integer():

@@ -1,8 +1,11 @@
 <component name="ProjectDictionaryState">
   <dictionary name="regula">
     <words>
+      <w>dicom</w>
+      <w>isyntax</w>
       <w>labelimage</w>
       <w>macroimage</w>
+      <w>pixelengine</w>
       <w>zarr</w>
     </words>
   </dictionary>
