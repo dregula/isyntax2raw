@@ -4,3 +4,4 @@ build
 dist
 isyntax_to_raw.egg-info
 isyntax2raw/version.py
+/1.isyntax

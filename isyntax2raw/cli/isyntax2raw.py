@@ -10,7 +10,7 @@
 import click
 import logging
 
-from .. import WriteTiles
+from isyntax2raw.isyntaxcontrib.write_tiles import WriteTiles
 
 
 @click.group()
